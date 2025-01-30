@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' ;
-import 'package:mined_2025/client/pages/landing_page/main_layout.dart';
 import 'client/router/router.dart';
 
 

@@ -16,6 +16,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
 
+  bool isLoginEnabled = false ;
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +28,12 @@ class _MainLayoutState extends State<MainLayout> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   context.go('/');
+                  isLoginEnabled = false;
                 },
                 child: MouseRegion(
-                  cursor:SystemMouseCursors.click,
+                  cursor: SystemMouseCursors.click,
                   child: Text(
                     "L O G O",
                     style: TextStyle(
@@ -45,16 +47,20 @@ class _MainLayoutState extends State<MainLayout> {
                   NavbarButton(
                       text: "Login",
                       textColor: AppColors.theme['deepPurpleColor'],
-                      hoverTextColor: AppColors.theme['deepPurpleColor'],
-                      lineColor: Colors.white,
+                      hoverTextColor: Colors.black,
+                      lineColor: AppColors.theme['deepPurpleColor'],
+                      isEnabled: isLoginEnabled,
                       onTap: () {
                         context.go('/login');
+                        isLoginEnabled = true;
+                        setState(() {});
                       }),
                   const SizedBox(width: 20),
                   CustomButton(
                     text: 'Register',
                     onTap: () {
                       context.go('/register');
+                      isLoginEnabled = false;
                     },
                   ),
                 ],
@@ -66,16 +72,7 @@ class _MainLayoutState extends State<MainLayout> {
         flexibleSpace: Container(
           height: double.infinity,
           width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.theme['bgGradient1Color']!,
-                AppColors.theme['bgGradient2Color']!,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          color: AppColors.theme['backgroundColor'],
         ),
         elevation: 0,
       ),

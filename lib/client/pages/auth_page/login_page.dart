@@ -13,14 +13,7 @@ class LoginPage extends StatelessWidget {
       height: double.infinity,
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.theme['bgGradient1Color']!,
-            AppColors.theme['bgGradient2Color']!,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.theme['backgroundColor'],
       ),
       child: const Center(
         child: Text(
