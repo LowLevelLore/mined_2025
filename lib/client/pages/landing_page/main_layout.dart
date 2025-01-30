@@ -35,12 +35,7 @@ class _MainLayoutState extends State<MainLayout> {
                   },
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: Text(
-                      "L O G O",
-                      style: TextStyle(
-                          color: AppColors.theme['deepPurpleColor'],
-                          fontWeight: FontWeight.bold),
-                    ),
+                    child: Image.asset("assets/images/logo.png",height: 50,width: 150,),
                   ),
                 ),
                 Row(

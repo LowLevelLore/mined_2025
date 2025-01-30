@@ -26,45 +26,47 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-        height: height,
-        width: isLoading! ? loadWidth : width,
-        child: Center(
-          child: isLoading!
-              ? Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    child: CircularProgressIndicator(
+      child: Center(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          height: height,
+          width: isLoading! ? loadWidth : width,
+          child: Center(
+            child: isLoading!
+                ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      child: CircularProgressIndicator(
+                        color: textColor,
+                      ),
+                    )),
+                SizedBox(width:10,),
+                Text(
+                  "Wait...",
+                  style: TextStyle(
                       color: textColor,
-                    ),
-                  )),
-              SizedBox(width:10,),
-              Text(
-                "Wait...",
-                style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
-              ),
-            ],
-          )
-              : Text(
-            title,
-            style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 18),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
+                ),
+              ],
+            )
+                : Text(
+              title,
+              style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            ),
           ),
-        ),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(10),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );
