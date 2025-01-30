@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mined_2025/client/models/user_model.dart';
+import 'package:provider/provider.dart';
 import '../../helper_functions/toasts.dart';
+import '../../providers/bucket_provider.dart';
 import '../init/config.dart';
 
 class AuthApi {
@@ -16,7 +19,11 @@ class AuthApi {
       WebToasts.showToastification("Confirmation", "Login Successful!",
           Icon(Icons.check_circle_outline, color: Colors.green), context);
 
-      // navigate page here
+      final bucketProvider = Provider.of<BucketsProvider>(context, listen: false);
+
+      bucketProvider.isLoginEnabled = false;
+      context.go('/home');
+
     } on FirebaseAuthException catch (e) {
       WebToasts.showToastification("Error", "Something went wrong!",
           Icon(Icons.error, color: Colors.red), context);
@@ -44,6 +51,15 @@ class AuthApi {
       );
 
       await createUserEmail(userCredential, email, name);
+
+      final bucketProvider = Provider.of<BucketsProvider>(context, listen: false);
+
+      WebToasts.showToastification("Confirmation", "Registration Successful!",
+          Icon(Icons.check_circle_outline, color: Colors.green), context);
+
+      bucketProvider.isLoginEnabled = false;
+      context.go('/home');
+
     } on FirebaseAuthException catch (e) {
       String errorMessage;
 

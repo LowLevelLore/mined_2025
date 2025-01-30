@@ -26,7 +26,7 @@ class _HoverCardState extends State<HoverCard> {
         onEnter: (_) => setState(() => isHovered = true),
         onExit: (_) => setState(() => isHovered = false),
         child: Transform.scale(
-          scale: isHovered ? 1.1 : 1.0,
+          scale: isHovered ? 1.0 : 1.0,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
