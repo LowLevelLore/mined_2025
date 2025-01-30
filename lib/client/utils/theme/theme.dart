@@ -18,7 +18,8 @@ class  AppColors {
     "theme1": {
       "backgroundColor" :hexStringToColors("#FFFEFA"),
       "deepPurpleColor" :hexStringToColors("#8300CE"),
-      "secondaryColor":hexStringToColors("#FFFFFF"),
+      "secondaryColor":hexStringToColors("#6E7076"),
+      "ghostWhiteColor":hexStringToColors("#F5F5F5"),
     },
   };
 

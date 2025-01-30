@@ -77,7 +77,7 @@ class _MainLayoutState extends State<MainLayout> {
           ),
           elevation: 0,
         ),
-        body: widget.child,
+          body: widget.child,
       );
     });
   }
