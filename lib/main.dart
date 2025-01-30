@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart' ;
+import 'package:provider/provider.dart';
+import 'client/providers/bucket_provider.dart';
 import 'client/router/router.dart';
 
 
 late Size mq ;
 
 void main(){
-  runApp(MyWebsite());
+  runApp(
+      MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context)=>BucketsProvider()),
+
+      ],
+      child: MyWebsite()));
 }
 
 class MyWebsite extends StatefulWidget {
