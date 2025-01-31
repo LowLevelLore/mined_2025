@@ -21,12 +21,12 @@ void main()async {
 
   runApp(
       MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context)=>BucketsProvider()),
-        ChangeNotifierProvider(create: (context)=>WebUserProvider()),
+          providers: [
+            ChangeNotifierProvider(create: (context)=>BucketsProvider()),
+            ChangeNotifierProvider(create: (context)=>WebUserProvider()),
 
-      ],
-      child: MyWebsite()));
+          ],
+          child: MyWebsite()));
 }
 
 class MyWebsite extends StatefulWidget {
