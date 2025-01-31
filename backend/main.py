@@ -361,6 +361,11 @@ def create_ppt_from_dict(
     print(f"PowerPoint presentation saved as {output_file}")
 
 
+@app.route("/hello")
+def hello():
+    return jsonify({"hello": "world"})
+
+
 @app.route("/generate-ppt", methods=["POST"])
 def generate_ppt():
     if request.method == "POST":
