@@ -5,7 +5,6 @@ import uuid
 from langgraph.graph import StateGraph
 from typing import Dict, Any
 from pydantic import BaseModel
-
 # Import your existing functions and graph setup
 from agent import graph, ResPaperExtractState, PPTPresentation, Conversation
 
