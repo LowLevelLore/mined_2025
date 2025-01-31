@@ -14,8 +14,8 @@ from typing import List, Dict, Any, Optional
 import fitz
 from pydantic import BaseModel, Field
 load_dotenv()
-os.environ["LANGSMITH_PROJECT"] = f"Deployed MineD 2025"
-
+# os.environ["LANGSMITH_PROJECT"] = f"Deployed MineD 2025"
+os.environ["LANGMSTIH_TRACING"] = "false"
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash",
     temperature=0,
@@ -38,13 +38,22 @@ class PPTPresentation(BaseModel):
     institution: str = Field(..., description="Institution associated with the presentation")
     slides: List[SlideContent] = Field(..., description="List of slides, in the presentation,which are SlideContent schemas.")
 
+class Dialogue(BaseModel):
+    text: str = Field(..., description="The text of dialogue")
+
+class Conversation(BaseModel):
+    katherine: List[Dialogue] = Field(..., description="Katherine's dialogues")
+    clay: List[Dialogue] = Field(..., description="Clay's dialogues")
+    order: List[str] = Field(..., description="The order of dialogues denoted by the names of the speaker")
+
 class ResPaperExtractState(TypedDict):
     pdf_path: Optional[str] = None  # Path to the PDF file
     extracted_text: Optional[str] = None  # Full extracted text from the PDF
     extracted_images: Optional[Dict[str,str]] = None  # Paths to extracted images
     slides_content: Optional[List[Dict[str, str]]] = None  # Prepared content for PowerPoint slides
-    metadata: str
     ppt_object: PPTPresentation
+    summary_text: Optional[str] = None
+    convo: Conversation = None
 
 def load_pdf(state: ResPaperExtractState):
     pdf_path = state["pdf_path"]
@@ -82,20 +91,93 @@ def load_pdf(state: ResPaperExtractState):
     # Update state
     return {"extracted_text": full_text, "extracted_images": extracted_images}
 
+def generate_summary(state: ResPaperExtractState):
+    extracted_text = state["extracted_text"]
+
+    summary_template_string_2 = """
+        You are an expert science communicator who specializes in breaking down complex research papers into engaging, conversational summaries. Your goal is to generate a summary that will be used to generate text for conversational podcast.
+        The summary should be structured in a way that makes it engaging for a podcast discussion. 
+        Include thought-provoking questions and key discussion points that make the findings compelling to a general audience.
+
+        ### **Instructions:**
+        - Start with an **intriguing hook** that captures the essence of the paper in an engaging way. 
+        - Clearly state the **research problem** and why it matters.
+        - Summarize the **key findings** and their implications, but in a way that sparks curiosity.
+        - **Use an engaging tone** that makes it feel like a conversation rather than a dry summary.
+        - Include at least **three discussion-worthy questions** that podcast hosts could debate.
+        - Highlight any **visual elements** that could be useful for a graphical abstract, such as relationships between variables, experimental results, or unexpected insights.
+
+        ### **Important Guidelines:**
+        - Keep it insightful yet engaging—avoid overly technical jargon unless necessary.  
+        - Don’t make the summary too short; ensure all important elements of the research are covered.  
+        - Aim for a summary length of **300-500 words** to balance depth with readability.  
+        - If applicable, include **real-world analogies** or examples to make the findings more relatable. 
+        - Remember, the goal is to make the research accessible and interesting to a broad audience.
+        - Return a single string with the summary text, acheiving the above objectives. 
+        Now, using these guidelines, generate a well-structured summary of the following research paper: {text}  
+
+    """
+    summary_prompt = PromptTemplate.from_template(summary_template_string_2)
+    # Generate summary with LLM
+    summary_text = llm.invoke(summary_prompt.format(text=extracted_text))  # No chunking, single LLM call
+    
+    return {"summary_text": summary_text}
+
+def generate_conversation(state: ResPaperExtractState):
+    system_message_podcast = SystemMessagePromptTemplate.from_template(
+    """You are an expert in creating/writing scripts for podcasts. 
+    Consider the given scenario: Two people one girl and one boy who are in final year of their B.Tech, are discussing the given research paper to create an podcast of this research paper
+    
+    Boy's Name: Clay
+    Girl's Name: Katherine
+    
+    The Girl has complete knowledge about this paper, while the boy doesn't know anything about the paper.
+    
+    Write a script for a podcast, wherein firstly the girl introduces the paper, but the boy seems clueless.So the boy ask the girl many questions about the paper, to understand the paper and learn more about the keyowrds and topics involved.
+    
+    The boy's question should cover all the possible doubt that one can have regarding the paper, and the girl should answer that questions correctly.
+
+    General Guideline:
+    - Intro must include the name, application and the authors (and their institution)
+    - Consider the audience to be technically sound, so you can ue jargons
+    - The boys questions should cover all the aspects from methodology, results, literature review, etc
+    - Dont make it too obvious that they are discussing about the paper
+    - Make the order such that the question asked by clay in previous dialogue is answered by katherine in this dialogue.
+
+    Additional Guidelines:
+    - Consider that the girl always starts first
+    - Also give the order of dialogues, that are to be taken in a sequence
+    - Make sure that the number of dialogues in the order and in the lists add up.
+    - Both of them dont have to speak alternatively, they can heave continuous dialogues
+    - Each and every question asked by clay has to be answered by katherine
+    - Make sure that the both the persons are not inventing anything of their own, nor should they give any wrong information.
+    - Don't give a name to this podcast
+    - If a particular entity or its name can't be inferred, don't mention them as placeholders in the conversation
+
+        {format_instructions}
+    """
+    )
+
+# Human Message: Supplies extracted text from the research paper
+    human_message_podcast = HumanMessagePromptTemplate.from_template("Here is the summary of research paper:\n\n{summary_text}. \nMake sure the tone is {tone}")
+
+    parser_podcast = JsonOutputParser(pydantic_object=Conversation)
+    # Combine into a structured chat prompt
+    chat_prompt_podcast = ChatPromptTemplate(
+        messages=[system_message_podcast, human_message_podcast],
+        partial_variables={"format_instructions": parser_podcast.get_format_instructions()}
+    )
+    summary_text = state["summary_text"]
+    prompt = chat_prompt_podcast.invoke({"summary_text": summary_text, "tone": "informative"})
+    llm_out = llm.invoke(prompt)
+    parsed = parser_podcast.invoke(llm_out)
+    
+    return {"convo":parsed}
+
+
 def get_data(state):
     extracted_text = state["extracted_text"]
-    
-    # Format prompt with extracted text
-    
-    # Invoke LLM with structured output
-    chain = chat_prompt | llm | parser
-
-    # Parse structured output into Pydantic model
-    ppt_object = chain.invoke({"extracted_text":extracted_text})
-    
-    return {"ppt_object": ppt_object}
-
-system_message = SystemMessagePromptTemplate.from_template(
+    system_message = SystemMessagePromptTemplate.from_template(
     """You are an expert in creating PowerPoint presentations. Generate a structured PowerPoint (PPT) presentation 
     that summarizes a research paper based on the provided extracted text. Follow these instructions:
     
@@ -106,11 +188,6 @@ system_message = SystemMessagePromptTemplate.from_template(
     - Introduction Slide: Summarize the problem, objectives, and motivation.
     - Methods Slide: Briefly explain the methodology, datasets, and experimental setup.
     - Results Slide: Summarize key findings with bullet points. Mention any visuals (graphs, tables) found from the extracted text. You should definetly mention in the presentation any figures related to a performance metric or tables that are mentioned in the extracted text.
-    - Graphics: Include any images of graphs or charts or other images, relevant to the results,or images depicting a performance metric,
-      that are mentioned in the extracted text. You can find such images by looking for any captions that mention figures or tables. 
-      It is necessary to name this slide as Graphics.
-      Note that you should only mention the image number, like Fig1, Fig2, etc...
-      Include only relevant image names.
     - Discussion Slide: Explain the significance of results and compare with prior work.
     - Conclusion Slide: Summarize key takeaways and potential future work.
     - References Slide: Include citations if available.
@@ -119,31 +196,40 @@ system_message = SystemMessagePromptTemplate.from_template(
     - Keep slides concise (use bullet points).
     - Maintain a professional and visually appealing slide design.
     - Give the text in markdown format.
-    - Each slide should have rich information content, summarizing the information related to the particular slide heading, 
-    and also include some content that is related to the slide heading but not directly mentioned in the extracted text.
+    - Each slide should have rich information content, summarizing the information related to the particular slide heading.
     - Also keep in mind that the text for each slide should not be too lengthy, and should be concise and to the point.
 
     {format_instructions}
     """
-)
+    )
 
-# Human Message: Supplies extracted text from the research paper
-human_message = HumanMessagePromptTemplate.from_template("Here is the extracted text:\n\n{extracted_text}")
+    # Human Message: Supplies extracted text from the research paper
+    human_message = HumanMessagePromptTemplate.from_template("Here is the extracted text:\n\n{extracted_text}")
 
-parser = JsonOutputParser(pydantic_object=PPTPresentation)
-# Combine into a structured chat prompt
-chat_prompt = ChatPromptTemplate(
-    messages=[system_message, human_message],
-    partial_variables={"format_instructions": parser.get_format_instructions()}
-)
+    parser = JsonOutputParser(pydantic_object=PPTPresentation)
+    # Combine into a structured chat prompt
+    chat_prompt = ChatPromptTemplate(
+        messages=[system_message, human_message],
+        partial_variables={"format_instructions": parser.get_format_instructions()}
+    )
+    # Invoke LLM with structured output
+    chain = chat_prompt | llm | parser
+
+    # Parse structured output into Pydantic model
+    ppt_object = chain.invoke({"extracted_text":extracted_text})
+    
+    return {"ppt_object": ppt_object}
 
 builder = StateGraph(ResPaperExtractState)
 
 builder.add_node("pdf-2-text", load_pdf)
 builder.add_node("text-condensation", get_data)
+builder.add_node("summary-text", generate_summary)
 
 builder.add_edge(START, "pdf-2-text")
 builder.add_edge("pdf-2-text", "text-condensation")
+builder.add_edge("pdf-2-text", "summary-text")
 builder.add_edge("text-condensation", END)
+builder.add_edge("summary-text", END)
 
 graph = builder.compile()
