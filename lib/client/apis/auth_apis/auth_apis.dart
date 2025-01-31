@@ -8,6 +8,7 @@ import '../../providers/bucket_provider.dart';
 import '../init/config.dart';
 
 class AuthApi {
+
   static Future<void> signIn(
       BuildContext context, String email, String password) async {
     try {
@@ -111,4 +112,5 @@ class AuthApi {
         await Config.firestore.collection('users').doc(userId).get();
     return docSnapshot.exists;
   }
+
 }

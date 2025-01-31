@@ -45,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
           "Something went wrong",
           Icon(Icons.error, color: Colors.red),
           context);
+      print(error);
     }
   }
 

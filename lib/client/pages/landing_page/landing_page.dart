@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mined_2025/client/providers/bucket_provider.dart';
-import 'package:mined_2025/client/utils/custom_containers/custom_contaner.dart';
 import 'package:mined_2025/client/utils/theme/theme.dart';
+import 'package:mined_2025/client/utils/widgets/custom_containers/custom_contaner.dart';
 import 'package:provider/provider.dart';
 
 class LandingPage extends StatefulWidget {

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mined_2025/client/utils/theme/theme.dart';
 
-class CustomButton extends StatefulWidget {
+class CustomButton2 extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
 
-  const CustomButton({super.key, required this.text, required this.onTap});
+  const CustomButton2({super.key, required this.text, required this.onTap});
 
   @override
-  State<CustomButton> createState() => _CustomButtonState();
+  State<CustomButton2> createState() => _CustomButtonState();
 }
 
-class _CustomButtonState extends State<CustomButton> {
+class _CustomButtonState extends State<CustomButton2> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

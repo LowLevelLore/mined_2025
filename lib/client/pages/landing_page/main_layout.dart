@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mined_2025/client/providers/bucket_provider.dart';
 import 'package:mined_2025/client/utils/theme/theme.dart';
+import 'package:mined_2025/client/utils/widgets/logo.dart';
 import 'package:mined_2025/client/utils/widgets/navbar/custom_button.dart';
 import 'package:mined_2025/client/utils/widgets/navbar/navbar_button.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _MainLayoutState extends State<MainLayout> {
                   },
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: Image.asset("assets/images/logo.png",height: 50,width: 150,),
+                    child: Logo(),
                   ),
                 ),
                 Row(
@@ -52,7 +53,7 @@ class _MainLayoutState extends State<MainLayout> {
                           setState(() {});
                         }),
                     const SizedBox(width: 20),
-                    CustomButton(
+                    CustomButton2(
                       text: 'Register',
                       onTap: () {
                         context.go('/register');

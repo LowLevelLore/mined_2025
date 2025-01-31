@@ -1,7 +1,9 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' ;
 import 'package:flutter/services.dart';
+import 'package:mined_2025/client/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'client/firebase_setup/firebase_options.dart';
 import 'client/providers/bucket_provider.dart';
@@ -21,6 +23,8 @@ void main()async {
       MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context)=>BucketsProvider()),
+        ChangeNotifierProvider(create: (context)=>WebUserProvider()),
+
       ],
       child: MyWebsite()));
 }
