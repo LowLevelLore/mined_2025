@@ -7,6 +7,14 @@ name = "pypi"
 flask = "*"
 gtts = "*"
 python-pptx = "*"
+pydub = "*"
+pyttsx3 = "*"
+pip = "*"
+install = "*"
+supabase = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 
