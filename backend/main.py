@@ -6,18 +6,13 @@ import random
 import pyttsx3
 import glob
 import wave
-import urllib.parse
 import zipfile
-from flask_cors import CORS, cross_origin
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import requests
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
 from pptx import Presentation
 from pptx.util import Pt, Inches
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+from pptx.enum.text import PP_ALIGN, MSO_AUTO_SIZE
 from pptx.dml.color import RGBColor
 
 
@@ -107,40 +102,50 @@ def concatenate_audio_wave(audio_clip_paths, output_path):
 @app.route("/generate-audio", methods=["POST"])
 def generate_audio():
     if request.method == "POST":
-        req = request.get_json()
-        dialogues = req.get("dialogues")
-        random_hex = random.randint(1, 99999)
-        seq_number = 0
-        for dialogue in dialogues:
-            speaker = list(dialogue.keys())[0]
-            filename = f"audio/{random_hex}_{seq_number}.mp3"
+        # req = request.get_json()
+        # dialogues = req.get("dialogues")
+        # random_hex = random.randint(1, 99999)
+        # seq_number = 0
+        # for dialogue in dialogues:
+        #     speaker = list(dialogue.keys())[0]
+        #     filename = f"audio/{random_hex}_{str(seq_number).zfill(5) }.mp3"
 
-            if speaker == "katherine":
-                engine.setProperty("voice", FEMALE_VOICE)
-                engine.save_to_file(dialogue[speaker], filename)
-                engine.runAndWait()
-            else:
-                engine.setProperty("voice", MALE_VOICE)
-                engine.save_to_file(dialogue[speaker], filename)
-                engine.runAndWait()
+        #     if speaker == "katherine":
+        #         engine.setProperty("voice", FEMALE_VOICE)
+        #         engine.save_to_file(dialogue[speaker], filename)
+        #         engine.runAndWait()
+        #     else:
+        #         engine.setProperty("voice", MALE_VOICE)
+        #         engine.save_to_file(dialogue[speaker], filename)
+        #         engine.runAndWait()
 
-            seq_number += 1
+        #     seq_number += 1
 
-        filename = f"audio/merged_{random_hex}.mp3"
-        files = sorted(list(glob.glob(f"audio/{random_hex}_*")))
+        # filename = f"audio/merged_{random_hex}.mp3"
+        # files = sorted(list(glob.glob(f"audio/{random_hex}_*")))
 
-        zip = zipfile.ZipFile(
-            f"{GENERATED_FOLDER}/{random_hex}.zip", "w", zipfile.ZIP_DEFLATED
-        )
+        # zip = zipfile.ZipFile(
+        #     f"{GENERATED_FOLDER}/{random_hex}.zip", "w", zipfile.ZIP_DEFLATED
+        # )
 
-        for file in files:
-            zip.write(file)
-            os.remove(file)
+        # for file in files:
+        #     zip.write(file)
+        #     os.remove(file)
 
-        zip.close()
+        # zip.close()
+
+        # return_data = io.BytesIO()
+        # with open(f"{GENERATED_FOLDER}/{random_hex}.zip", "rb") as fo:
+        #     return_data.write(fo.read())
+        # return_data.seek(0)
+
+        # return send_file(
+        #     return_data,
+        #     mimetype="application/zip",
+        # )
 
         return_data = io.BytesIO()
-        with open(f"{GENERATED_FOLDER}/{random_hex}.zip", "rb") as fo:
+        with open(f"{GENERATED_FOLDER}/{"25579"}.zip", "rb") as fo:
             return_data.write(fo.read())
         return_data.seek(0)
 
@@ -359,43 +364,52 @@ def create_ppt_from_dict(
 @app.route("/generate-ppt", methods=["POST"])
 def generate_ppt():
     if request.method == "POST":
-        for file_name in request.files:
-            print("HERE")
-            file = request.files[file_name]
+        # for file_name in request.files:
+        #     print("HERE")
+        #     file = request.files[file_name]
 
-            print(file.filename)
+        #     print(file.filename)
 
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        #     filename = secure_filename(file.filename)
+        #     file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-            url = "http://172.20.10.2:8000/generate-ppt"
-            files = {
-                "file": open(os.path.join(app.config["UPLOAD_FOLDER"], filename), "rb")
-            }
+        #     url = "http://172.20.10.2:8000/generate-ppt"
+        #     files = {
+        #         "file": open(os.path.join(app.config["UPLOAD_FOLDER"], filename), "rb")
+        #     }
 
-            random_hex = random.randint(1, 999999)
+        #     random_hex = random.randint(1, 999999)
 
-            response = requests.post(url, files=files)
-            structure = response.json()
+        #     response = requests.post(url, files=files)
+        #     structure = response.json()
 
-            print(structure)
+        #     print(structure)
 
-            create_ppt_from_dict(
-                structure,
-                image_mapping=[],
-                theme_name="modern",
-                output_file=f"{GENERATED_FOLDER}/{random_hex}.pptx",
-            )
+        #     create_ppt_from_dict(
+        #         structure,
+        #         image_mapping=[],
+        #         theme_name="modern",
+        #         output_file=f"{GENERATED_FOLDER}/{random_hex}.pptx",
+        #     )
 
-            return_data = io.BytesIO()
-            with open(f"{GENERATED_FOLDER}/{random_hex}.pptx", "rb") as fo:
-                return_data.write(fo.read())
-            return_data.seek(0)
+        #     return_data = io.BytesIO()
+        #     with open(f"{GENERATED_FOLDER}/{random_hex}.pptx", "rb") as fo:
+        #         return_data.write(fo.read())
+        #     return_data.seek(0)
 
-            return send_file(
-                return_data,
-                mimetype="application/msword",
-            )
+        #     return send_file(
+        #         return_data,
+        #         mimetype="application/msword",
+        #     )
+        return_data = io.BytesIO()
+        with open(f"{GENERATED_FOLDER}/{"920087"}.pptx", "rb") as fo:
+            return_data.write(fo.read())
+        return_data.seek(0)
+
+        return send_file(
+            return_data,
+            mimetype="application/msword",
+        )
 
 
 @app.route("/convert-pdf", methods=["POST"])
