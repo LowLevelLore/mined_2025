@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+gtts = "*"
+python-pptx = "*"
+pydub = "*"
+pyttsx3 = "*"
+pip = "*"
+install = "*"
+supabase = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

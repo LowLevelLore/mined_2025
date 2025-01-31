@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+manimgl = "*"
+pyttsx3 = "*"
+gtts = "*"
+python-vlc = "*"
+python-pptx = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
