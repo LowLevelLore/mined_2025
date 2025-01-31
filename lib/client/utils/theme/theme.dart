@@ -20,6 +20,7 @@ class  AppColors {
       "deepPurpleColor" :hexStringToColors("#8300CE"),
       "secondaryColor":hexStringToColors("#6E7076"),
       "ghostWhiteColor":hexStringToColors("#F5F5F5"),
+      "podcastColor":hexStringToColors("#C93224"),
     },
   };
 

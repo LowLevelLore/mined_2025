@@ -1,3 +1,4 @@
+import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mined_2025/client/apis/init/config.dart';
 import 'package:mined_2025/client/helper_functions/toasts.dart';
+import 'package:mined_2025/client/pages/home_page/pod_cast_part.dart';
 import 'package:mined_2025/client/providers/bucket_provider.dart';
 import 'package:mined_2025/client/providers/user_provider.dart';
 import 'package:mined_2025/client/utils/buttons/custom_button.dart';
@@ -26,6 +28,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   bool _isSidebarExpanded = true;
   String currentChatData = '';
   List<String> chatHistory = [];
@@ -41,6 +44,52 @@ class _HomePageState extends State<HomePage> {
   Uint8List? fileBytes;
   FilePickerResult? pdf;
 
+  List<String> extractedFiles = [];
+
+
+  Future<void> pickAndUnzipFile() async {
+    // Pick the zip file
+    final result = await FilePicker.platform.pickFiles(
+      allowedExtensions: ['zip'],
+      type: FileType.custom,
+    );
+
+    if (result == null) return;
+
+    final bytes = result.files.single.bytes;
+
+    final archive = ZipDecoder().decodeBytes(bytes!);
+
+    List<String> extractedFiles = [];
+
+    for (final file in archive) {
+      if (file.isFile) {
+        extractedFiles.add(file.name);
+      }
+    }
+
+    extractedFiles.sort((a, b) {
+      final aNum = int.tryParse(RegExp(r'\d+').firstMatch(a)?.group(0) ?? '0');
+      final bNum = int.tryParse(RegExp(r'\d+').firstMatch(b)?.group(0) ?? '0');
+      return aNum!.compareTo(bNum!);
+    });
+
+    setState(() {
+      extractedFiles = extractedFiles;
+
+    });
+
+    if (extractedFiles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No audio files found in the zip.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${extractedFiles.length} audio file(s) extracted')),
+      );
+    }
+  }
+
   Future<void> takePdf() async {
     pdf = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -48,6 +97,16 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (pdf != null) {
+
+      WebToasts.showToastification(
+          "Success",
+          "Pdf Successfully Uploaded",
+          Icon(
+            Icons.error_outline_rounded,
+            color: Colors.red,
+          ),
+          context);
+
       setState(() {
         fileName = pdf?.files.single.name;
         fileBytes = pdf?.files.single.bytes;
@@ -56,6 +115,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> sendPDF() async {
+
     if (pdf != null) {
       Uint8List? fileBytes = pdf?.files.single.bytes;
 
@@ -70,6 +130,7 @@ class _HomePageState extends State<HomePage> {
           ));
 
         try {
+
           var response = await request.send();
 
           if (response.statusCode == 200) {
@@ -121,6 +182,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -283,11 +345,7 @@ class _HomePageState extends State<HomePage> {
                               "Select a chat to view or create chat",
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold, fontSize: 20),
-                          ) : Text(
-                            currentChatData,
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold, fontSize: 20),
-                          ),
+                          ) :   PodCastPart(extractedFiles: extractedFiles,),
                         ),
                       ),
                     ),
@@ -334,7 +392,8 @@ class _HomePageState extends State<HomePage> {
                                           cursor: SystemMouseCursors.click,
                                           child: GestureDetector(
                                             onTap: () async {
-                                              await takePdf();
+                                              // await takePdf();
+                                              await pickAndUnzipFile();
                                             },
                                             child: Container(
                                               // width: 120 ,
@@ -441,6 +500,20 @@ class _HomePageState extends State<HomePage> {
               width: mq.width * 0.25,
               child: Column(
                 children: [
+                  Container(
+                    width: mq.width*1,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300)
+                    ),
+                    height:  mq.height * 0.1,
+                    child: Center(
+                      child: Text(
+                        "Summary",
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    )  ,
+                  ),
                   Expanded(
                     child: Container(
                       height: mq.height * 0.3,
@@ -459,7 +532,36 @@ class _HomePageState extends State<HomePage> {
                       borderRadius:
                           BorderRadius.only(bottomLeft: Radius.circular(10)),
                     ),
-                    child: Center(child: Text("AUDIO HERE")),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Container(
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  spreadRadius: 0.4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            borderRadius:BorderRadius.circular(10),
+                          ),
+                          child: Row(
+
+                            children: [
+
+                              Image.asset("assets/images/ppt_image.png",height: 50,width: 50,),
+
+
+                            ],
+
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
