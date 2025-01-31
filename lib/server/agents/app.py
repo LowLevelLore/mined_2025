@@ -40,8 +40,8 @@ def generate_ppt(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
     
     finally:
-        os.remove(pdf_path)  # Cleanup uploaded file
-
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
