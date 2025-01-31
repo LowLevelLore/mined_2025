@@ -14,8 +14,8 @@ from typing import List, Dict, Any, Optional
 import fitz
 from pydantic import BaseModel, Field
 load_dotenv()
-# os.environ["LANGSMITH_PROJECT"] = f"Deployed MineD 2025"
-os.environ["LANGMSTIH_TRACING"] = "false"
+os.environ["LANGMSTIH_TRACING"] = "true"
+os.environ["LANGSMITH_PROJECT"] = f"Deployed MineD 2025"
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash",
     temperature=0,
@@ -223,13 +223,14 @@ def get_data(state):
 builder = StateGraph(ResPaperExtractState)
 
 builder.add_node("pdf-2-text", load_pdf)
-builder.add_node("text-condensation", get_data)
+builder.add_node("ppt-extract", get_data)
 builder.add_node("summary-text", generate_summary)
+builder.add_node("conversation", generate_conversation)
 
 builder.add_edge(START, "pdf-2-text")
-builder.add_edge("pdf-2-text", "text-condensation")
+builder.add_edge("pdf-2-text", "ppt-extract")
 builder.add_edge("pdf-2-text", "summary-text")
-builder.add_edge("text-condensation", END)
-builder.add_edge("summary-text", END)
-
+builder.add_edge("summary-text", "conversation")
+builder.add_edge("ppt-extract", END)
+builder.add_edge("conversation", END)
 graph = builder.compile()
