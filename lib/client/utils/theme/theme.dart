@@ -16,10 +16,11 @@ class  AppColors {
   static Map themes = {
 
     "theme1": {
-      "bgGradient1Color":hexStringToColors("FF5F0F40"),
-      "bgGradient2Color":hexStringToColors("#FF310E68"),
-      "deepPurpleColor" :Colors.deepPurpleAccent,
-      "secondaryColor":hexStringToColors("#FFFFFF"),
+      "backgroundColor" :hexStringToColors("#FFFEFA"),
+      "deepPurpleColor" :hexStringToColors("#8300CE"),
+      "secondaryColor":hexStringToColors("#6E7076"),
+      "ghostWhiteColor":hexStringToColors("#F5F5F5"),
+      "podcastColor":hexStringToColors("#C93224"),
     },
   };
 

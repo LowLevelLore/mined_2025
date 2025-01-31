@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mined_2025/client/pages/auth_page/login_page.dart';
 import 'package:mined_2025/client/pages/auth_page/register_page.dart';
+import 'package:mined_2025/client/pages/home_page/home_page.dart';
 import 'package:mined_2025/client/pages/landing_page/main_layout.dart';
 import '../pages/landing_page/landing_page.dart';
 
@@ -25,6 +26,12 @@ final GoRouter router = GoRouter(
         const MainLayout(child: RegisterPage()),
       ),
     ),
+    GoRoute(
+      path: "/home",
+      pageBuilder: (context, state) => _noAnimationPage(
+        const HomePage(),
+      ),
+    ),
   ],
 );
 
@@ -37,3 +44,4 @@ Page<void> _noAnimationPage(Widget child) {
     transitionDuration: Duration.zero,
   );
 }
+

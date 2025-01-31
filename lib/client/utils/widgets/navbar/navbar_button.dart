@@ -6,14 +6,16 @@ class NavbarButton extends StatefulWidget {
   final Color hoverTextColor;
   final Color lineColor;
   final VoidCallback onTap;
+  final bool isEnabled;
 
-  const NavbarButton({
+  NavbarButton({
     super.key,
     required this.text,
     required this.textColor,
     required this.hoverTextColor,
     required this.lineColor,
     required this.onTap,
+    this.isEnabled = false, // Default to false
   });
 
   @override
@@ -22,20 +24,13 @@ class NavbarButton extends StatefulWidget {
 
 class _NavbarButtonState extends State<NavbarButton> {
   bool _isHovered = false;
-  double _lineWidth = 0.0;
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() {
-        _isHovered = true;
-        _lineWidth = 40.0;
-      }),
-      onExit: (_) => setState(() {
-        _isHovered = false;
-        _lineWidth = 0.0;
-      }),
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
         child: Column(
@@ -44,16 +39,18 @@ class _NavbarButtonState extends State<NavbarButton> {
             Text(
               widget.text,
               style: TextStyle(
-                color: _isHovered ? widget.hoverTextColor : widget.textColor,
+                color: _isHovered || widget.isEnabled
+                    ? widget.hoverTextColor
+                    : widget.textColor,
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w900,
               ),
             ),
-             SizedBox(height: 4),
+            const SizedBox(height: 4),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               height: 2,
-              width: _lineWidth,
+              width: (widget.isEnabled || _isHovered) ? 40.0 : 0.0,
               decoration: BoxDecoration(
                 color: widget.lineColor,
                 borderRadius: BorderRadius.circular(2),
